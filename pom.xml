@@ -17,7 +17,7 @@
 
 	<dependencies>
 		<!-- logging -->
-		<dependency>
+	<!--	<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
@@ -27,12 +27,12 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 			<scope>test</scope>
-		</dependency>
-		<!--<dependency>
+		</dependency>-->
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.2</version>
-		</dependency>-->
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -44,6 +44,41 @@
 			<version>${hutool.core}</version>
 		</dependency>
 	</dependencies>
+
+	<developers>
+		<developer>
+			<id>renxian</id>
+			<name>renxian</name>
+			<email>327360297@qq.com</email>
+			<organization>com.xueqiu</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>HaydnSyx</id>
+			<name>HaydnSyx</name>
+			<email>HaydnSyx@163.com</email>
+			<organization>com.xueqiu</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>Apache License</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://github.com/synpore/StreamingBatchTask.git</url>
+		<connection>scm:git:https://github.com/synpore/StreamingBatchTask.git</connection>
+		<developerConnection>scm:git:git@github.com:synpore/StreamingBatchTask.git</developerConnection>
+		<tag>${project.version}</tag>
+	</scm>
 
 	<properties>
 		<java.version>1.8</java.version>
