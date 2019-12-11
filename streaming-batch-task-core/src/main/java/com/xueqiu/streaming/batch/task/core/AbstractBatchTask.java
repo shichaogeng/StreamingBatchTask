@@ -68,6 +68,8 @@ public abstract class AbstractBatchTask implements BatchTask {
                 init();
                 // 执行job
                 execute();
+                logger.info("{} finished,failed_num={},success_num={}" , getTaskSymbolStr(),
+                        TaskContextHolder.get().getFailedNum(),TaskContextHolder.get().getSuccessNum());
                 // 通知执行结果
                 notice();
             }

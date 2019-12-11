@@ -79,7 +79,7 @@ public class SimpleBatchTaskTest {
                             .pullData((index, size) -> Arrays.asList("111", "222"))
                             .jobContent((e) -> {
                                 try {
-                                    Thread.sleep(1000 * 30);
+                                    Thread.sleep(1000 * 60);
                                 } catch (InterruptedException e1) {
                                 }
                                 return true;

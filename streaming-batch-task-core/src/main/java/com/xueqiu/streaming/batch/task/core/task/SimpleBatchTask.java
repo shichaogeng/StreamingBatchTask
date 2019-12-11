@@ -115,10 +115,14 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
 
     @Override
     protected void execute() {
-        Long index = startIndex;
-        AtomicInteger successNum = TaskContextHolder.get().getSuccessNum();
-        AtomicInteger failedNum = TaskContextHolder.get().getFailedNum();
+        streamUnit(startIndex);
+    }
+
+    protected void streamUnit(Long startIndex){
+        Long index=startIndex;
         while (true) {
+            AtomicInteger successNum = TaskContextHolder.get().getSuccessNum();
+            AtomicInteger failedNum = TaskContextHolder.get().getFailedNum();
             List<T> data = null;
             try {
                 data = pullData.doNow(index, size);
@@ -135,7 +139,7 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
             data.stream().forEach((e) -> executorService.submit(() -> {
                         try {
                             if(logger.isDebugEnabled()){
-                                logger.debug(getTaskSymbolStr()+"handle data "+identifier.apply(e));
+                                logger.debug(getTaskSymbolStr()+" handle data "+identifier.apply(e));
                             }
                             TaskJobResult result = this.jobHandler.doJobContent(e);
                             if (result.isSuccessFlag()) {
@@ -157,9 +161,7 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
             if (data.size() < size)
                 break;
         }
-        logger.info("{} finished,failed_num={}" , getTaskSymbolStr(),failedRecord.size());
     }
-
 
     //拉取的第一批数据非空
     @Override

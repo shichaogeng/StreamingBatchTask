@@ -61,6 +61,8 @@ public class TaskWrapper {
             this.statisticData.add(taskResultInfo);
         } finally {
             taskLock.unlock();
+            //to remove thread local variable to avoid memory leak
+            TaskContextHolder.clear();
         }
     }
 

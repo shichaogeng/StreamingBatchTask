@@ -5,12 +5,12 @@
     <parent>
         <artifactId>streaming-batch-task</artifactId>
         <groupId>com.xueqiu</groupId>
-        <version>1.1-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>streaming-batch-task-common</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
     <name>streaming-batch-task-common</name>
     <packaging>jar</packaging>
 
