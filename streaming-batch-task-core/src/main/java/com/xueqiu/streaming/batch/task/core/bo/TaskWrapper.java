@@ -48,7 +48,6 @@ public class TaskWrapper {
     public void finish() {
         taskLock.lock();
         try {
-            this.running = false;
             this.lastFinishTime = Calendar.getInstance().getTimeInMillis();
             this.executeTimes.getAndIncrement();
             TaskResultInfo taskResultInfo = TaskResultInfo.builder()
@@ -59,6 +58,10 @@ public class TaskWrapper {
                     .failedCount(TaskContextHolder.get().getFailedNum().intValue())
                     .build();
             this.statisticData.add(taskResultInfo);
+            //初始化了的任务获得了执行权
+            if(TaskContextHolder.get().getIsTaskOwner()){
+                this.running = false;
+            }
         } finally {
             taskLock.unlock();
         }
