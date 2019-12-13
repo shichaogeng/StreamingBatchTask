@@ -6,7 +6,7 @@
 
 ![](https://github.com/synpore/StreamingBatchTask/blob/master/batchTaskArchetecture.png?raw=true)
 
-#what we solve？
+#what problem we solve？
 
 1、too much data can't pull successfully at once
 
@@ -21,7 +21,7 @@
 
 ```xml
 <dependency>
-  <groupId>com.xueqiu</groupId>
+  <groupId>com.xueqiu.fundx</groupId>
     <artifactId>streaming-batch-task-core</artifactId>
     <version>1.0-RELEASE</version>
 </dependency>
