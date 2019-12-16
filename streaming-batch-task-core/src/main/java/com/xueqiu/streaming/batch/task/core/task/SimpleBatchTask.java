@@ -55,51 +55,24 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
 
     protected Vector<String> failedRecord = new Vector<>();
 
-    public static SimpleBatchTask buildTask(SimpleTaskConfig taskConfig) {
-        Assert.notNull(taskConfig.getJobContent(), "SimpleTaskConfig.jobContent");
-        Assert.notNull(taskConfig.getPullData(), "SimpleTaskConfig.pullData");
-        Assert.notNull(taskConfig.getTaskName(), "SimpleTaskConfig.taskName");
-
-        int size = taskConfig.getSize();
-        if (size <= 0) {
-            size = GlobalBatchTaskConfig.DEFAULT_BATCH_SIZE;
-        } else if (size > GlobalBatchTaskConfig.MAX_BATCH_SIZE) {
-            size = GlobalBatchTaskConfig.MAX_BATCH_SIZE;
-        }
-
-        int threadNum = taskConfig.getThreadNum();
-        if (threadNum <= 0) {
-            threadNum = GlobalBatchTaskConfig.DEFAULT_THREAD_NUM;
-        } else if (threadNum > GlobalBatchTaskConfig.MAX_THREAD_NUM) {
-            threadNum = GlobalBatchTaskConfig.MAX_THREAD_NUM;
-        }
-
-        if (PooledResourceStrategy.CUSTOM.equals(taskConfig.getStrategy()) && taskConfig.getExecutorService() == null) {
-            throw new IllegalArgumentException("executorService can't be null when choose custom pool strategy");
-        }
-
-        // 通过注解获取到identifier和indexInfo方法（静态配置）
-        if (taskConfig.getIndexInfo() == null && taskConfig.getCls() != null) {
-            TaskSettingWrapper indexWrapper = new TaskSettingWrapper(taskConfig.getCls(), TaskIndex.class, Arrays.asList("long", "java.lang.Long"));
-            if (indexWrapper.isUsable()) {
-                taskConfig.setIndexInfo(t -> indexWrapper.getSettingInfo(t, Long.class));
-            }
-        }
-        if (taskConfig.getIdentifier() == null && taskConfig.getCls() != null) {
-            TaskSettingWrapper keyWrapper = new TaskSettingWrapper(taskConfig.getCls(), TaskKey.class, Arrays.asList("java.lang.String"));
-            if (keyWrapper.isUsable()) {
-                taskConfig.setIdentifier(t -> keyWrapper.getSettingInfo(t, String.class));
-            }
-        }
-
-        SimpleBatchTask simpleBatchTask = new SimpleBatchTask(size, taskConfig.getPullData(), taskConfig.getJobContent(), taskConfig.getTaskName(), threadNum, taskConfig.getStrategy(), taskConfig.getExecutorService());
+    public static <T> SimpleBatchTask buildTask(SimpleTaskConfig<T> taskConfig) {
+        SimpleTaskConfig.buildTaskCheck(taskConfig);
+        SimpleBatchTask simpleBatchTask = new SimpleBatchTask(taskConfig.getSize(), taskConfig.getPullData(), taskConfig.getJobContent(), taskConfig.getTaskName(), taskConfig.getThreadNum(), taskConfig.getStrategy(), taskConfig.getExecutorService());
         simpleBatchTask.indexInfo = taskConfig.getIndexInfo();
         simpleBatchTask.identifier = taskConfig.getIdentifier();
-
         return simpleBatchTask;
     }
 
-    private SimpleBatchTask(int size, PullData<T> pullData, JobContent<T> jobContent, String taskName, int threadNum, PooledResourceStrategy strategy, ExecutorService executorService) {
+    protected SimpleBatchTask() {
+    }
+
+    protected SimpleBatchTask(SimpleTaskConfig taskConfig) {
+        this(taskConfig.getSize(), taskConfig.getPullData(), taskConfig.getJobContent(), taskConfig.getTaskName(), taskConfig.getThreadNum(), taskConfig.getStrategy(), taskConfig.getExecutorService());
+        this.indexInfo = taskConfig.getIndexInfo();
+        this.identifier = taskConfig.getIdentifier();
+    }
+
+    protected SimpleBatchTask(int size, PullData<T> pullData, JobContent<T> jobContent, String taskName, int threadNum, PooledResourceStrategy strategy, ExecutorService executorService) {
         super(taskName, threadNum, strategy, executorService);
         this.size = size;
         this.pullData = pullData;
