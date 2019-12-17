@@ -1,0 +1,13 @@
+package com.xueqiu.fundx.streaming.batch.task.core.exception;
+
+/**
+ * @Description:
+ * @Author:renxian
+ * @Date:2019-12-04
+ */
+public class NoResourceException extends RuntimeException {
+
+    public NoResourceException(String message) {
+        super(message);
+    }
+}
