@@ -1,4 +1,4 @@
-package com.xueqiu.streaming.batch.task.core;
+package com.xueqiu.fundx.streaming.batch.task.core;
 
 /**
  * @Description:

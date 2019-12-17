@@ -31,9 +31,9 @@
 ```java
 package com.synpore.streamBatchTask;
 
-import com.xueqiu.streaming.batch.task.core.PooledResourceStrategy;
-import com.xueqiu.streaming.batch.task.core.SimpleBatchTask;
-import com.xueqiu.streaming.batch.task.core.SimpleTaskConfig;
+import PooledResourceStrategy;
+import SimpleBatchTask;
+import SimpleTaskConfig;
 import lombok.Builder;
 import lombok.Data;
 
