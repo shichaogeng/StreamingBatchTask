@@ -90,7 +90,7 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
             try {
                 data = pullData.doNow(index, size);
             } catch (Exception e) {
-                logger.info("{} pull data exception,index={},size={}", getTaskSymbolStr(),index,size);
+                logger.info("{} pull data exception,index={},size={}", getTaskSymbolStr(),index,size,e);
             }
             if (CollectionUtil.isEmpty(data)) {
                 break;
