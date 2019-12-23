@@ -1,8 +1,9 @@
 package com.xueqiu.fundx.streaming.batch.task.core.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-//@AllArgsConstructor
+@AllArgsConstructor
 @Data
 public class BaseTaskConfig<T> {
 
@@ -18,7 +19,7 @@ public class BaseTaskConfig<T> {
 //
 //    private ExecutorService executorService;
 
-    private Class<T> cls;
+    protected Class<T> cls;
 
     public BaseTaskConfig() {
     }

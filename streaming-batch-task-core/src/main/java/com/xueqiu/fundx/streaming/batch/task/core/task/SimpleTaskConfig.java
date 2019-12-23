@@ -22,7 +22,7 @@ import java.util.function.Function;
  * @Author:renxian
  * @Date:2019-12-04
  */
-@Builder
+
 @Data
 public class SimpleTaskConfig<T> extends BaseTaskConfig {
 
@@ -50,6 +50,22 @@ public class SimpleTaskConfig<T> extends BaseTaskConfig {
 
     @Builder.Default
     private PooledResourceStrategy strategy = PooledResourceStrategy.COMMON;
+
+    @Builder
+    public SimpleTaskConfig(Class cls, PullData<T> pullData, JobContent<T> jobContent, Function<T, Long> indexInfo, Function<T, String> identifier, int size, String taskName, int threadNum, ExecutorService executorService, int shardIndex, int shardNum, PooledResourceStrategy strategy) {
+        super(cls);
+        this.pullData = pullData;
+        this.jobContent = jobContent;
+        this.indexInfo = indexInfo;
+        this.identifier = identifier;
+        this.size = size;
+        this.taskName = taskName;
+        this.threadNum = threadNum;
+        this.executorService = executorService;
+        this.shardIndex = shardIndex;
+        this.shardNum = shardNum;
+        this.strategy = strategy;
+    }
 
     public static SimpleTaskConfig buildTaskCheck(SimpleTaskConfig taskConfig){
         Assert.notNull(taskConfig.getJobContent(), "SimpleTaskConfig.jobContent is null");

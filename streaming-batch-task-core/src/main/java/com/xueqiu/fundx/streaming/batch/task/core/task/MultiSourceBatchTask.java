@@ -16,7 +16,7 @@ import java.util.List;
  * @Author:renxian
  * @Date:2019-12-11
  */
-public class MultiSourceBatchTask<T> extends SimpleBatchTask<T> {
+public class MultiSourceBatchTask extends SimpleBatchTask {
 
     public static final Logger logger = LoggerFactory.getLogger(MultiSourceBatchTask.class);
 
@@ -27,7 +27,7 @@ public class MultiSourceBatchTask<T> extends SimpleBatchTask<T> {
 
     private int shardNum;
 
-    public static <T> MultiSourceBatchTask buildTask(SimpleTaskConfig<T> taskConfig) {
+    public static  MultiSourceBatchTask buildTask(SimpleTaskConfig taskConfig) {
         Assert.notNull(taskConfig.getCls(), "MultiSourceBatchTask.cls is null");
         if (taskConfig.getShardNum() > 0) {
             Assert.isTrue(taskConfig.getShardIndex() >= 0 && taskConfig.getShardIndex() < taskConfig.getShardNum()
