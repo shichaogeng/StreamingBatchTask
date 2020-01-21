@@ -51,8 +51,13 @@ public class SimpleTaskConfig<T> extends BaseTaskConfig {
     @Builder.Default
     private PooledResourceStrategy strategy = PooledResourceStrategy.COMMON;
 
+    @Builder.Default
+    private boolean groupSerial=false;
+
+    private Function<T,Object> grouping;
+
     @Builder
-    public SimpleTaskConfig(Class cls, PullData<T> pullData, JobContent<T> jobContent, Function<T, Long> indexInfo, Function<T, String> identifier, int size, String taskName, int threadNum, ExecutorService executorService, int shardIndex, int shardNum, PooledResourceStrategy strategy) {
+    public SimpleTaskConfig(Class cls, PullData<T> pullData, JobContent<T> jobContent, Function<T, Long> indexInfo, Function<T, String> identifier, int size, String taskName, int threadNum, ExecutorService executorService, int shardIndex, int shardNum, PooledResourceStrategy strategy, boolean groupSerial, Function<T, Object> grouping) {
         super(cls);
         this.pullData = pullData;
         this.jobContent = jobContent;
@@ -65,13 +70,17 @@ public class SimpleTaskConfig<T> extends BaseTaskConfig {
         this.shardIndex = shardIndex;
         this.shardNum = shardNum;
         this.strategy = strategy;
+        this.groupSerial = groupSerial;
+        this.grouping = grouping;
     }
 
     public static SimpleTaskConfig buildTaskCheck(SimpleTaskConfig taskConfig){
         Assert.notNull(taskConfig.getJobContent(), "SimpleTaskConfig.jobContent is null");
         Assert.notNull(taskConfig.getPullData(), "SimpleTaskConfig.pullData is null");
         Assert.notNull(taskConfig.getTaskName(), "SimpleTaskConfig.taskName is null");
-
+        if(taskConfig.isGroupSerial()){
+            Assert.notNull(taskConfig.getGrouping(), "SimpleTaskConfig.grouping can't be null when groupSerial is true");
+        }
         int size = taskConfig.getSize();
         if (size <= 0) {
             taskConfig.size = GlobalBatchTaskConfig.DEFAULT_BATCH_SIZE;

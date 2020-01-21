@@ -2,15 +2,15 @@ package com.xueqiu.fundx.streaming.batch.task.core.task;
 
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.xueqiu.fundx.streaming.batch.task.core.AbstractBatchTask;
 import com.xueqiu.fundx.streaming.batch.task.core.annotation.TaskIndex;
 import com.xueqiu.fundx.streaming.batch.task.core.annotation.TaskKey;
 import com.xueqiu.fundx.streaming.batch.task.core.bo.TaskJobResult;
+import com.xueqiu.fundx.streaming.batch.task.core.bo.TaskSettingWrapper;
 import com.xueqiu.fundx.streaming.batch.task.core.config.PooledResourceStrategy;
+import com.xueqiu.fundx.streaming.batch.task.core.context.TaskContextHolder;
 import com.xueqiu.fundx.streaming.batch.task.core.function.JobContent;
 import com.xueqiu.fundx.streaming.batch.task.core.function.PullData;
-import com.xueqiu.fundx.streaming.batch.task.core.AbstractBatchTask;
-import com.xueqiu.fundx.streaming.batch.task.core.bo.TaskSettingWrapper;
-import com.xueqiu.fundx.streaming.batch.task.core.context.TaskContextHolder;
 import com.xueqiu.fundx.streaming.batch.task.core.handler.JobHandler;
 import com.xueqiu.fundx.streaming.batch.task.core.handler.impl.DefaultJobHandler;
 import lombok.Getter;
@@ -20,11 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Description:
@@ -49,15 +50,21 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
 
     private Function<T, String> identifier;
 
+    private Function<T,Object> grouping;
+
     private CountDownLatch countDownLatch = new CountDownLatch(0);
 
     protected Vector<String> failedRecord = new Vector<>();
+
+    private boolean groupSerial=false;
 
     public static <T> SimpleBatchTask buildTask(SimpleTaskConfig<T> taskConfig) {
         SimpleTaskConfig.buildTaskCheck(taskConfig);
         SimpleBatchTask simpleBatchTask = new SimpleBatchTask(taskConfig.getSize(), taskConfig.getPullData(), taskConfig.getJobContent(), taskConfig.getTaskName(), taskConfig.getThreadNum(), taskConfig.getStrategy(), taskConfig.getExecutorService());
         simpleBatchTask.indexInfo = taskConfig.getIndexInfo();
         simpleBatchTask.identifier = taskConfig.getIdentifier();
+        simpleBatchTask.grouping=taskConfig.getGrouping();
+        simpleBatchTask.groupSerial=taskConfig.isGroupSerial();
         return simpleBatchTask;
     }
 
@@ -92,8 +99,6 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
     protected void streamUnit(Long startIndex){
         Long index=startIndex;
         while (true) {
-            AtomicInteger successNum = TaskContextHolder.get().getSuccessNum();
-            AtomicInteger failedNum = TaskContextHolder.get().getFailedNum();
             List<T> data = null;
             try {
                 data = pullData.doNow(index, size);
@@ -105,28 +110,15 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
             }
             // 前置预处理
             pre(data.get(0));
-
-            this.countDownLatch = new CountDownLatch(data.size());
-            data.stream().forEach((e) -> executorService.submit(() -> {
-                        try {
-                            if(logger.isDebugEnabled()){
-                                logger.debug(getTaskSymbolStr()+" handle data "+identifier.apply(e));
-                            }
-                            TaskJobResult result = this.jobHandler.doJobContent(e);
-                            if (result.isSuccessFlag()) {
-                                successNum.getAndIncrement();
-                            } else {
-                                failedNum.getAndIncrement();
-                                failedRecord.add(identifier.apply(e));
-                            }
-                        } catch (Exception ex) {
-                            failedRecord.add(identifier.apply(e));
-                            failedNum.getAndIncrement();
-                        } finally {
-                            this.countDown();
-                        }
-                    })
-            );
+            //支持分组后串行处理
+            if(groupSerial){
+                Map<Object,List<T>> groupMap=data.stream().collect(Collectors.groupingBy(grouping));
+                this.countDownLatch = new CountDownLatch(groupMap.size());
+                groupMap.forEach((k,v) -> executorService.submit(() ->v.stream().forEach((e)->doSingleDataContent(e))));
+            }else{
+                this.countDownLatch = new CountDownLatch(data.size());
+                data.stream().forEach((e) -> executorService.submit(()->doSingleDataContent(e)));
+            }
             this.await();
             index = indexInfo.apply(data.get(data.size() - 1));
             if (data.size() < size)
@@ -166,4 +158,26 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
             }
         }
     }
+
+    //minimum data handle unit
+    private void doSingleDataContent(T t){
+        try {
+            if(logger.isDebugEnabled()){
+                logger.debug(getTaskSymbolStr()+" handle data "+identifier.apply(t));
+            }
+            TaskJobResult result = this.jobHandler.doJobContent(t);
+            if (result.isSuccessFlag()) {
+                TaskContextHolder.get().getSuccessNum().getAndIncrement();
+            } else {
+                TaskContextHolder.get().getFailedNum().getAndIncrement();
+                failedRecord.add(identifier.apply(t));
+            }
+        } catch (Exception ex) {
+            failedRecord.add(identifier.apply(t));
+            TaskContextHolder.get().getFailedNum().getAndIncrement();
+        } finally {
+            this.countDown();
+        }
+    }
+
 }

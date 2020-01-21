@@ -116,14 +116,14 @@ public abstract class AbstractBatchTask implements BatchTask {
                 break;
             case CREATE_DESTROY:
                 checkThreadResource();
-                executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory(taskName));
+                executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory(getTaskSymbolStr()));
                 break;
             case CACHED:
                 checkThreadResource();
                 executorService = taskWrapper.getExecutorService();
                 if (executorService == null) {
                     //maybe has be cleared by demon thread
-                    executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory(taskName));
+                    executorService = Executors.newFixedThreadPool(threadCount, new NamedThreadFactory(getTaskSymbolStr()));
                     taskWrapper.setExecutorService(executorService);
                 }
         }
