@@ -1,9 +1,9 @@
 package com.xueqiu.fundx.streaming.batch.task.core.task;
 
 import cn.hutool.core.lang.Assert;
-import com.xueqiu.sharding.client.read.core.bean.SplitDbTableSession;
-import com.xueqiu.sharding.client.read.core.context.SplitDbTableContext;
-import com.xueqiu.sharding.client.read.core.context.SplitDbTableSessionHolder;
+import com.xueqiu.fundx.sharding.client.read.core.bean.SplitDbTableSession;
+import com.xueqiu.fundx.sharding.client.read.core.context.SplitDbTableContext;
+import com.xueqiu.fundx.sharding.client.read.core.context.SplitDbTableSessionHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
