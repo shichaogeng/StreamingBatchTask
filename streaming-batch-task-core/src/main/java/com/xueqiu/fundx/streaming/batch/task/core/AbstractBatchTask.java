@@ -137,7 +137,7 @@ public abstract class AbstractBatchTask implements BatchTask {
             switch (pooledResourceStrategy) {
                 //自定义的线程池资源不在框架控制范围内
                 case CUSTOM:
-                    executorService.shutdown();
+                    //executorService.shutdown();
                     break;
                 case CREATE_DESTROY:
                     GlobalBatchTaskConfig.releaseThreadResource(threadCount);
