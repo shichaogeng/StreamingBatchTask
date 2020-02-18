@@ -27,7 +27,7 @@ public class MultiSourceBatchTask extends SimpleBatchTask {
 
     private int shardNum;
 
-    public static  MultiSourceBatchTask buildTask(SimpleTaskConfig taskConfig) {
+    public static  MultiSourceBatchTask buildMutiSourceTask(SimpleTaskConfig taskConfig) {
         Assert.notNull(taskConfig.getCls(), "MultiSourceBatchTask.cls is null");
         if (taskConfig.getShardNum() > 0) {
             Assert.isTrue(taskConfig.getShardIndex() >= 0 && taskConfig.getShardIndex() < taskConfig.getShardNum()
