@@ -48,7 +48,7 @@ public class MultiSourceBatchTask extends SimpleBatchTask {
     protected void execute() {
         List<SplitDbTableSession> sessions = SplitDbTableContext.getSessions(clazz);
         if (sessions == null) {
-            logger.error("{} get SplitDbTable config failed,please check you @SplitDbTable config");
+            logger.error("{} get SplitDbTable config failed,please check you @SplitDbTable config",getTaskSymbolStr());
             return;
         }
         for (int i = 0; i < sessions.size(); i++) {
