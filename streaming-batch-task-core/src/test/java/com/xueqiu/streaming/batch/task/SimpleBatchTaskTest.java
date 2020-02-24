@@ -1,6 +1,9 @@
 package com.xueqiu.streaming.batch.task;
 
+import cn.hutool.core.math.MathUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.xueqiu.fundx.streaming.batch.task.core.config.PooledResourceStrategy;
+import com.xueqiu.fundx.streaming.batch.task.core.context.TaskManageContainer;
 import com.xueqiu.fundx.streaming.batch.task.core.task.SimpleBatchTask;
 import com.xueqiu.fundx.streaming.batch.task.core.task.SimpleTaskConfig;
 import com.xueqiu.streaming.batch.task.bean.Order;
@@ -132,4 +135,42 @@ public class SimpleBatchTaskTest {
 
     }
 
+    @Test
+    public void testDestroy(){
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SimpleTaskConfig<String> simpleTaskConfig = SimpleTaskConfig.<String>builder()
+                        .taskName("testDestroy")
+                        .size(1000)
+                        .threadNum(2)
+                        .strategy(PooledResourceStrategy.CREATE_DESTROY)
+                        .indexInfo(r -> null)
+                        .identifier(r -> r)
+                        .pullData((index, size) -> Arrays.asList("111", "222", "333", "444", "555", "666"))
+                        .jobContent((e) -> {
+                            try {
+                                Thread.sleep(1000 * 10);
+                            } catch (InterruptedException e1) {
+                            }
+                            return true;
+                        })
+                        .build();
+                SimpleBatchTask.buildTask(simpleTaskConfig).beginTask();
+                countDownLatch.countDown();
+            }
+        }).start();
+        try {
+            Thread.currentThread().sleep(15*1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //terminate task manually
+        TaskManageContainer.TaskManageContainerFactory.getInstance().destroy("testDestroy");
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+        }
+    }
 }

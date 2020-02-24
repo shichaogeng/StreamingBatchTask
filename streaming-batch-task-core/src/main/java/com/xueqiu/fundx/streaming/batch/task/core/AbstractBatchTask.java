@@ -128,7 +128,7 @@ public abstract class AbstractBatchTask implements BatchTask {
                 }
         }
         taskWrapper.start();
-        TaskContextHolder.get().setHasInitialized(true);
+        TaskContextHolder.initGet(taskName).setHasInitialized(true);
         logger.info(getTaskSymbolStr()+" complete initialization");
     }
 

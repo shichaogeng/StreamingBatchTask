@@ -13,12 +13,19 @@ public class TaskContextHolder {
     public static ThreadLocal<TaskContext> taskContextThreadLocal = new ThreadLocal() {
         @Override
         protected TaskContext initialValue() {
-            return TaskContext.builder().taskStatus(GlobalBatchTaskConfig.TaskStatus.NORMAL).build();
+            return TaskContext
+                    .builder()
+                    .taskStatus(GlobalBatchTaskConfig.TaskStatus.NORMAL)
+                    .build();
         }
     };
 
     public static void setStatus(GlobalBatchTaskConfig.TaskStatus taskStatus) {
         taskContextThreadLocal.get().setTaskStatus(taskStatus);
+    }
+
+    public static TaskContext initGet(String taskName) {
+        return taskContextThreadLocal.get().setTaskWrapperIfNotExist(taskName);
     }
 
     public static TaskContext get() {

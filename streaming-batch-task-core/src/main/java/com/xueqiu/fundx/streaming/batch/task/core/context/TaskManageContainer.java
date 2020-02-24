@@ -55,12 +55,14 @@ public class TaskManageContainer implements TaskAttributeAccessor<TaskWrapper>, 
     }
 
     @Override
+    @Deprecated
     public void finish(String taskName) {
-        finishTask(taskName);
+       //doNothing
     }
 
     @Override
-    public void destory(String taskName) {
+    public void destroy(String taskName) {
+        cachedTask.get(taskName).destroy();
     }
 
     public boolean checkTask(String taskName) {

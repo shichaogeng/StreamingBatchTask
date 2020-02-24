@@ -8,6 +8,7 @@ import com.xueqiu.fundx.streaming.batch.task.core.annotation.TaskKey;
 import com.xueqiu.fundx.streaming.batch.task.core.bo.TaskJobResult;
 import com.xueqiu.fundx.streaming.batch.task.core.bo.TaskSettingWrapper;
 import com.xueqiu.fundx.streaming.batch.task.core.config.PooledResourceStrategy;
+import com.xueqiu.fundx.streaming.batch.task.core.context.TaskContext;
 import com.xueqiu.fundx.streaming.batch.task.core.context.TaskContextHolder;
 import com.xueqiu.fundx.streaming.batch.task.core.function.JobContent;
 import com.xueqiu.fundx.streaming.batch.task.core.function.PullData;
@@ -98,8 +99,13 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
 
     protected void streamUnit(Long startIndex){
         Long index=startIndex;
+        TaskContext taskContext=TaskContextHolder.get();
         while (true) {
             List<T> data = null;
+            if(taskContext.isInterrupted()){
+                logger.info("{} is terminated by destroy method", getTaskSymbolStr());
+                break;
+            }
             try {
                 data = pullData.doNow(index, size);
             } catch (Exception e) {
@@ -114,10 +120,10 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
             if(groupSerial){
                 Map<Object,List<T>> groupMap=data.stream().collect(Collectors.groupingBy(grouping));
                 this.countDownLatch = new CountDownLatch(groupMap.size());
-                groupMap.forEach((k,v) -> executorService.submit(() ->v.stream().forEach((e)->doSingleDataContent(e))));
+                groupMap.forEach((k,v) -> executorService.submit(() ->v.stream().forEach((e)->doSingleDataContent(e,taskContext))));
             }else{
                 this.countDownLatch = new CountDownLatch(data.size());
-                data.stream().forEach((e) -> executorService.submit(()->doSingleDataContent(e)));
+                data.stream().forEach((e) -> executorService.submit(()->doSingleDataContent(e,taskContext)));
             }
             this.await();
             index = indexInfo.apply(data.get(data.size() - 1));
@@ -160,21 +166,24 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
     }
 
     //minimum data handle unit
-    private void doSingleDataContent(T t){
+    private void doSingleDataContent(T t, TaskContext taskContext){
         try {
+            if(taskContext.isInterrupted()){
+                return;//just return;
+            }
             if(logger.isDebugEnabled()){
                 logger.debug(getTaskSymbolStr()+" handle data "+identifier.apply(t));
             }
             TaskJobResult result = this.jobHandler.doJobContent(t);
             if (result.isSuccessFlag()) {
-                TaskContextHolder.get().getSuccessNum().getAndIncrement();
+                taskContext.getSuccessNum().getAndIncrement();
             } else {
-                TaskContextHolder.get().getFailedNum().getAndIncrement();
+                taskContext.getFailedNum().getAndIncrement();
                 failedRecord.add(identifier.apply(t));
             }
         } catch (Exception ex) {
             failedRecord.add(identifier.apply(t));
-            TaskContextHolder.get().getFailedNum().getAndIncrement();
+            taskContext.getFailedNum().getAndIncrement();
         } finally {
             this.countDown();
         }

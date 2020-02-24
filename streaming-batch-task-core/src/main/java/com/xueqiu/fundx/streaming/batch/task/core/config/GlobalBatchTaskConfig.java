@@ -62,7 +62,9 @@ public class GlobalBatchTaskConfig {
         NO_RESOURCE(1),
         IS_RUNNING(2),
         END_EXCEPTION(3),
-        NORMAL(4);
+        NORMAL(4),
+        END_INTERRUPTED(5),//运行期间中断
+        ;
 
         private int status;
 

@@ -1,6 +1,7 @@
 package com.xueqiu.fundx.streaming.batch.task.core.bo;
 
 
+import com.xueqiu.fundx.streaming.batch.task.core.config.GlobalBatchTaskConfig;
 import com.xueqiu.fundx.streaming.batch.task.core.context.TaskContextHolder;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +34,8 @@ public class TaskWrapper {
     private AtomicInteger executeTimes = new AtomicInteger();
     @Builder.Default
     private final List<TaskResultInfo> statisticData = new ArrayList<>();
+    @Builder.Default
+    private volatile boolean interrupted = false;
 
 
     public void start() {
@@ -53,7 +56,7 @@ public class TaskWrapper {
             TaskResultInfo taskResultInfo = TaskResultInfo.builder()
                     .startTime(this.startTime)
                     .costTime(this.lastFinishTime - this.startTime)
-                    .taskStatus(TaskContextHolder.get().getTaskStatus())
+                    .taskStatus(getResultStatus())
                     .successCount(TaskContextHolder.get().getSuccessNum().intValue())
                     .failedCount(TaskContextHolder.get().getFailedNum().intValue())
                     .build();
@@ -82,5 +85,17 @@ public class TaskWrapper {
         } finally {
             taskLock.unlock();
         }
+    }
+
+    public void destroy(){
+            this.interrupted=true;
+    }
+
+
+    private GlobalBatchTaskConfig.TaskStatus getResultStatus(){
+        if(interrupted){
+            return GlobalBatchTaskConfig.TaskStatus.END_INTERRUPTED;
+        }
+        return TaskContextHolder.get().getTaskStatus();
     }
 }

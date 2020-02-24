@@ -1,5 +1,6 @@
 package com.xueqiu.fundx.streaming.batch.task.core.context;
 
+import com.xueqiu.fundx.streaming.batch.task.core.bo.TaskWrapper;
 import com.xueqiu.fundx.streaming.batch.task.core.config.GlobalBatchTaskConfig;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +28,21 @@ public class TaskContext {
     private AtomicInteger successNum = new AtomicInteger();
     @Builder.Default
     private AtomicInteger failedNum = new AtomicInteger();
+
+    private TaskWrapper taskWrapper;
+
+    public TaskContext setTaskWrapperIfNotExist(String taskName) {
+        if (taskWrapper == null) {
+            this.taskWrapper = TaskManageContainer.TaskManageContainerFactory.getInstance().getTaskWrapper(taskName);
+        }
+        return this;
+    }
+
+    public boolean isInterrupted() {
+        if (taskWrapper != null && taskWrapper.isInterrupted()) {
+            return true;
+        }
+        return false;
+    }
 
 }
