@@ -19,19 +19,19 @@
     <parent>
         <artifactId>streaming-batch-task</artifactId>
         <groupId>com.xueqiu.fundx</groupId>
-        <version>2.0-SNAPSHOT</version>
+        <version>2.0-RELEASE</version>
     </parent>
 
     <groupId>com.xueqiu.fundx</groupId>
     <artifactId>streaming-batch-task-core</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.xueqiu.fundx</groupId>
             <artifactId>streaming-batch-task-common</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>2.0-RELEASE</version>
         </dependency>
 
         <dependency>
@@ -43,7 +43,7 @@
         <dependency>
             <artifactId>sharding-client-read-spring</artifactId>
             <groupId>com.xueqiu.fundx</groupId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0-RELEASE</version>
         </dependency>
     </dependencies>
     
