@@ -173,4 +173,30 @@ public class SimpleBatchTaskTest {
         } catch (InterruptedException e) {
         }
     }
+
+    /**
+     * 任务开始前不校验是否存在数据hasData()
+     */
+    @Test
+    public void noHasDataCheckTest() {
+        SimpleTaskConfig<String> simpleTaskConfig=new SimpleTaskConfig<String>().toBuilder()
+                .taskName("noHasDataCheckTest")
+                .size(1000)
+                .threadNum(2)
+                .strategy(PooledResourceStrategy.CREATE_DESTROY)
+                .indexInfo(r -> null)
+                .identifier(r -> r)
+                .pullData((index, size) -> Collections.emptyList())
+                .dataCheck(false)
+                .jobContent((e) -> {
+                    try {
+                        Thread.sleep(1000 * 10);
+                    } catch (InterruptedException e1) {
+                    }
+                    return true;
+                })
+                .build();
+            SimpleBatchTask.buildTask(simpleTaskConfig).beginTask();
+    }
+
 }

@@ -6,7 +6,7 @@
 
 	<groupId>com.xueqiu.fundx</groupId>
 	<artifactId>streaming-batch-task</artifactId>
-	<version>2.1-SNAPSHOT</version>
+	<version>2.2-SNAPSHOT</version>
     <name>StreamingBatchTask</name>
 	<packaging>pom</packaging>
 

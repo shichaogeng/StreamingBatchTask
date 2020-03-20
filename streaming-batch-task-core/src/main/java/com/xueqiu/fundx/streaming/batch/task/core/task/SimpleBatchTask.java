@@ -59,6 +59,8 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
 
     private boolean groupSerial=false;
 
+    private boolean dataCheck=true;
+
     public static <T> SimpleBatchTask buildTask(SimpleTaskConfig<T> taskConfig) {
         SimpleTaskConfig.buildTaskCheck(taskConfig);
         SimpleBatchTask simpleBatchTask = new SimpleBatchTask(taskConfig.getSize(), taskConfig.getPullData(), taskConfig.getJobContent(), taskConfig.getTaskName(), taskConfig.getThreadNum(), taskConfig.getStrategy(), taskConfig.getExecutorService());
@@ -66,6 +68,7 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
         simpleBatchTask.identifier = taskConfig.getIdentifier();
         simpleBatchTask.grouping=taskConfig.getGrouping();
         simpleBatchTask.groupSerial=taskConfig.isGroupSerial();
+        simpleBatchTask.dataCheck=taskConfig.isDataCheck();
         return simpleBatchTask;
     }
 
@@ -135,7 +138,7 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
     //拉取的第一批数据非空
     @Override
     protected boolean hasData() {
-        return CollectionUtil.isNotEmpty(pullData.doNow(startIndex, size));
+        return !dataCheck||CollectionUtil.isNotEmpty(pullData.doNow(startIndex, size));
     }
 
     private void countDown() {

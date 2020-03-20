@@ -12,6 +12,7 @@ import com.xueqiu.fundx.streaming.batch.task.core.bo.TaskSettingWrapper;
 import com.xueqiu.fundx.streaming.batch.task.core.config.GlobalBatchTaskConfig;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,7 @@ import java.util.function.Function;
  */
 
 @Data
+@NoArgsConstructor
 public class SimpleTaskConfig<T> extends BaseTaskConfig {
 
     private PullData<T> pullData;
@@ -56,8 +58,10 @@ public class SimpleTaskConfig<T> extends BaseTaskConfig {
 
     private Function<T,Object> grouping;
 
-    @Builder
-    public SimpleTaskConfig(Class cls, PullData<T> pullData, JobContent<T> jobContent, Function<T, Long> indexInfo, Function<T, String> identifier, int size, String taskName, int threadNum, ExecutorService executorService, int shardIndex, int shardNum, PooledResourceStrategy strategy, boolean groupSerial, Function<T, Object> grouping) {
+    private boolean dataCheck=true;
+
+    @Builder(toBuilder = true)
+    public SimpleTaskConfig(Class cls, PullData<T> pullData, JobContent<T> jobContent, Function<T, Long> indexInfo, Function<T, String> identifier, int size, String taskName, int threadNum, ExecutorService executorService, int shardIndex, int shardNum, PooledResourceStrategy strategy, boolean groupSerial, Function<T, Object> grouping,  boolean dataCheck) {
         super(cls);
         this.pullData = pullData;
         this.jobContent = jobContent;
@@ -72,6 +76,11 @@ public class SimpleTaskConfig<T> extends BaseTaskConfig {
         this.strategy = strategy;
         this.groupSerial = groupSerial;
         this.grouping = grouping;
+        this.dataCheck=dataCheck;
+    }
+
+    public  Boolean getDataCheckDefault(){
+        return true;
     }
 
     public static SimpleTaskConfig buildTaskCheck(SimpleTaskConfig taskConfig){
