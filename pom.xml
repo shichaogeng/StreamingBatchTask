@@ -6,7 +6,7 @@
 
 	<groupId>com.xueqiu.fundx</groupId>
 	<artifactId>streaming-batch-task</artifactId>
-	<version>2.2-RELEASE</version>
+	<version>2.3.0</version>
     <name>StreamingBatchTask</name>
 	<packaging>pom</packaging>
 
@@ -88,16 +88,21 @@
 		<hutool.core>4.3.2</hutool.core>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>central</id>
+			<url>http://repo.snowballfinance.com/artifactory/repo</url>
+		</repository>
+	</repositories>
+
 	<distributionManagement>
 		<repository>
-			<id>snowball_release</id>
-			<name>snowball_release</name>
-			<url>http://repo.snowballfinance.com/nexus/content/repositories/releases/</url>
+			<id>xueqiu_artifactory_release</id>
+			<url>http://repo.snowballfinance.com/artifactory/libs-release-local/</url>
 		</repository>
 		<snapshotRepository>
-			<id>snowball_snapshot</id>
-			<name>snowball_snapshot</name>
-			<url>http://repo.snowballfinance.com/nexus/content/repositories/snapshots/</url>
+			<id>xueqiu_artifactory_snapshot</id>
+			<url>http://repo.snowballfinance.com/artifactory/libs-snapshot-local/</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>
