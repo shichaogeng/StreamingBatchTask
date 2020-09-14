@@ -60,8 +60,12 @@ public class SimpleTaskConfig<T> extends BaseTaskConfig {
 
     private boolean dataCheck=true;
 
+    @Builder.Default
+    private boolean onceDataPull=false;
+
     @Builder(toBuilder = true)
-    public SimpleTaskConfig(Class cls, PullData<T> pullData, JobContent<T> jobContent, Function<T, Long> indexInfo, Function<T, String> identifier, int size, String taskName, int threadNum, ExecutorService executorService, int shardIndex, int shardNum, PooledResourceStrategy strategy, boolean groupSerial, Function<T, Object> grouping,  boolean dataCheck) {
+    public SimpleTaskConfig(Class cls, PullData<T> pullData, JobContent<T> jobContent, Function<T, Long> indexInfo, Function<T, String> identifier, int size, String taskName, int threadNum
+            , ExecutorService executorService, int shardIndex, int shardNum, PooledResourceStrategy strategy, boolean groupSerial, Function<T, Object> grouping,  boolean dataCheck,boolean onceDataPull) {
         super(cls);
         this.pullData = pullData;
         this.jobContent = jobContent;
@@ -77,6 +81,7 @@ public class SimpleTaskConfig<T> extends BaseTaskConfig {
         this.groupSerial = groupSerial;
         this.grouping = grouping;
         this.dataCheck=dataCheck;
+        this.onceDataPull=onceDataPull;
     }
 
     public  Boolean getDataCheckDefault(){

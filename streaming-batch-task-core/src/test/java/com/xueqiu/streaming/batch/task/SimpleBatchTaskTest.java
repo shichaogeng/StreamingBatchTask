@@ -199,4 +199,30 @@ public class SimpleBatchTaskTest {
             SimpleBatchTask.buildTask(simpleTaskConfig).beginTask();
     }
 
+
+    /**
+     * 单次拉取数据
+     */
+    @Test
+    public void oncePullDataTest() {
+        SimpleTaskConfig<String> simpleTaskConfig=new SimpleTaskConfig<String>().toBuilder()
+                .taskName("oncePullDataTest")
+                .size(3)
+                .threadNum(2)
+                .onceDataPull(true)
+                .strategy(PooledResourceStrategy.CREATE_DESTROY)
+                .indexInfo(r -> null)
+                .identifier(r -> r)
+                .pullData((index, size) ->  Arrays.asList("111", "222", "333", "444", "555", "666"))
+                .dataCheck(false)
+                .jobContent((e) -> {
+
+                    return true;
+                })
+                .build();
+        SimpleBatchTask.buildTask(simpleTaskConfig).beginTask();
+    }
+
+
+
 }

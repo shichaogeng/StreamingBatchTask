@@ -61,6 +61,8 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
 
     private boolean dataCheck=true;
 
+    private boolean onceDataPull=false;
+
     public static <T> SimpleBatchTask buildTask(SimpleTaskConfig<T> taskConfig) {
         SimpleTaskConfig.buildTaskCheck(taskConfig);
         SimpleBatchTask simpleBatchTask = new SimpleBatchTask(taskConfig.getSize(), taskConfig.getPullData(), taskConfig.getJobContent(), taskConfig.getTaskName(), taskConfig.getThreadNum(), taskConfig.getStrategy(), taskConfig.getExecutorService());
@@ -69,6 +71,7 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
         simpleBatchTask.grouping=taskConfig.getGrouping();
         simpleBatchTask.groupSerial=taskConfig.isGroupSerial();
         simpleBatchTask.dataCheck=taskConfig.isDataCheck();
+        simpleBatchTask.onceDataPull=taskConfig.isOnceDataPull();
         return simpleBatchTask;
     }
 
@@ -130,7 +133,7 @@ public class SimpleBatchTask<T> extends AbstractBatchTask {
             }
             this.await();
             index = indexInfo.apply(data.get(data.size() - 1));
-            if (data.size() < size)
+            if (data.size() < size||this.onceDataPull)
                 break;
         }
     }
